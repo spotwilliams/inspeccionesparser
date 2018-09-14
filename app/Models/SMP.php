@@ -1,12 +1,11 @@
 <?php
 
 namespace App\Models;
-/**
- * Description of SMP
- *
- * @author Debi
- */
-class SMP extends \Illuminate\Database\Eloquent\Model {
+
+use Illuminate\Database\Eloquent\Model;
+
+class SMP extends Model
+{
     protected $table = 'spm';
     
 }

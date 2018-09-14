@@ -8,14 +8,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Description of Inspeccion
  *
  * @author Debi
  */
-class Inspeccion extends \Illuminate\Database\Eloquent\Model{
+class Inspeccion extends Model
+{
     protected $table = 'inspecciones';
     
-    
-     
 }
