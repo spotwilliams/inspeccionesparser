@@ -19,4 +19,6 @@ class Inspeccion extends Model
 {
     protected $table = 'inspecciones';
     
+    protected $guarded = [];
+    public $timestamps = false;
 }

@@ -12,7 +12,7 @@
     </select>
 
     <label>Archivo: </label>
-    <input type="file" name="archivo" accept=".xls, .xlsx">
+    <input type="file" name="archivo" accept=".xls, .xlsx, .csv">
 
     <br>
     <br>
