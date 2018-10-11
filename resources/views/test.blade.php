@@ -2,7 +2,7 @@
 
 @section('content')
     @include('shared.errors')
-    <form method="post" enctype="multipart/form-data"  action="{{url('test')}}">
+    <form method="post" enctype="multipart/form-data"  action="{{route('subirarchivo')}}">
         {!! csrf_field() !!}
         <div class="form-group">
             <label for="area">&Aacute;rea: </label>

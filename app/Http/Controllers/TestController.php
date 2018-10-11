@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inspeccion;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Collections\CellCollection;
 use Maatwebsite\Excel\Facades\Excel;
 use \Illuminate\Http\Request;
@@ -39,25 +40,40 @@ class TestController
      */
     public function upload(Request $request)
     {
+        $transactionId = time() . uniqid(mt_rand(), false);
+        
         if (!$request->file()) {
             // Esta validacion se puede hacer con Laravel.
-            return back()->with('message-danger', 'No se ha cargado ningún archivo');
+            flash('No se ha cargado ningún archivo')->error();
+            
+            return back();
         }
         
-        $input = $request->all();
-        
-        /** @var string $archivo Es la ruta donde esta el archivo. */
-        // la funcion guardarArchivo ubica el mismo en storage/app/uploads
-        $archivo = $this->guardarArchivo($request);
-        
-        $this->ingresarInspeccion($archivo);
-        $this->exportExcel();
+        try {
+            DB::beginTransaction();
+            /** @var string $archivo Es la ruta donde esta el archivo. */
+            // la funcion guardarArchivo ubica el mismo en storage/app/uploads
+            $archivo = $this->guardarArchivo($request);
+            
+            $this->ingresarInspeccion($archivo, $transactionId);
+            
+            DB::commit();
+            flash('Proceso realizado correctamente')->success();
+            
+            return redirect(route('exportarView', ['transactionId' => $transactionId]));
+            
+        } catch (\Exception $exception) {
+            
+            DB::rollBack();
+            flash('Sucedio un error')->error($exception->getMessage());
+            
+            return redirect(route('index'));
+        }
     }
     
     /**
      * @param Request $request
-     * @param string $area
-     * @return string Devuelve la ubicacion del archivo
+     * @return string
      */
     protected function guardarArchivo(Request $request)
     {
@@ -71,15 +87,16 @@ class TestController
         return $ubicacion;
     }
     
-    public function ingresarInspeccion($archivo)
+    public function ingresarInspeccion($archivo, $transactionId)
     {
         
-        Excel::load($archivo, function (LaravelExcelReader $reader) {
+        Excel::load($archivo, function (LaravelExcelReader $reader) use ($transactionId) {
             
-            $reader->chunk(10, function (RowCollection $rowCollection) {
+            $reader->chunk(10, function (RowCollection $rowCollection) use ($transactionId) {
                 
-                $rowCollection->each(function ($row) {
+                $rowCollection->each(function ($row) use ($transactionId) {
                     $inspeccion                = new Inspeccion();
+                    $inspeccion->transaccionId = $transactionId;
                     $inspeccion->id            = $row->id;
                     $inspeccion->dependencia   = $row->dependencia;
                     $inspeccion->area          = $row->area;
@@ -121,17 +138,22 @@ class TestController
         return $smp;
     }
     
-    public function exportExcel()
+    public function exportView($transactionId)
     {
-        // dd(Inspeccion::first());
+        return view('download')
+            ->with('transactionId', $transactionId);
+    }
+    
+    public function exportExcel(Request $request)
+    {
         /**
          * toma en cuenta que para ver los mismos
          * datos debemos hacer la misma consulta
          **/
-        Excel::create('Export', function ($excel) {
-            $excel->sheet('Excel sheet', function ($sheet) {
-                //otra opción -> $products = Product::select('name')->get();
-                $inspecciones = Inspeccion::all();
+        Excel::create('Export', function ($excel) use ($request) {
+            $excel->sheet('Excel sheet', function ($sheet) use ($request) {
+                $inspecciones = Inspeccion::where('transaccionId', '=', $request->input('transactionId'))
+                    ->get();
                 $sheet->fromArray($inspecciones);
                 $sheet->setOrientation('landscape');
             });
