@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inspeccion;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Collections\CellCollection;
 use Maatwebsite\Excel\Facades\Excel;
@@ -53,9 +54,11 @@ class TestController
             DB::beginTransaction();
             /** @var string $archivo Es la ruta donde esta el archivo. */
             // la funcion guardarArchivo ubica el mismo en storage/app/uploads
-            $archivo = $this->guardarArchivo($request);
+            $archivos = $this->guardarArchivo($request);
             
-            $this->ingresarInspeccion($archivo, $transactionId);
+            foreach ($archivos as $archivo) {
+                $this->ingresarInspeccion($archivo, $transactionId);
+            }
             
             DB::commit();
             flash('Proceso realizado correctamente')->success();
@@ -73,18 +76,24 @@ class TestController
     
     /**
      * @param Request $request
-     * @return string
+     * @return array
      */
     protected function guardarArchivo(Request $request)
     {
-        // Le damos un nombre al archivo unico para que no se repita
-        $nombre = 'inspecciones_' . uniqid() . '.' . $request->file('archivo')->extension();
+        $files = [];
+        /** @var UploadedFile $file */
+        foreach ($request->file('archivo') as $file) {
+            
+            // Le damos un nombre al archivo unico para que no se repita
+            $nombre = 'inspecciones_' . uniqid() . '.' . $file->extension();
+            
+            $file->storeAs('uploads', $nombre);
+            
+            $ubicacion = 'storage/app/uploads/' . $nombre;
+            $files[]   = $ubicacion;
+        }
         
-        $request->file('archivo')->storeAs('uploads', $nombre);
-        
-        $ubicacion = 'storage/app/uploads/' . $nombre;
-        
-        return $ubicacion;
+        return $files;
     }
     
     public function ingresarInspeccion($archivo, $transactionId)

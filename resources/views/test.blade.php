@@ -16,7 +16,7 @@
         </div>
         <div class="form-group">
             <label>Archivo: </label>
-            <input type="file" name="archivo" accept=".xls, .xlsx, .csv" multiple>
+            <input type="file" name="archivo[]" accept=".xls, .xlsx, .csv" multiple>
 
         </div>
         <div class="form-group">
