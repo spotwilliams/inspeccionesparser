@@ -1,20 +1,29 @@
-<form method="post" enctype="multipart/form-data" action="{{url('test')}}">
-{!! csrf_field() !!}
-    <label>&Aacute;rea: </label>
+@extends('layouts.app')
 
-    <select name="area">
+@section('content')
+    @include('shared.errors')
+    <form method="post" enctype="multipart/form-data"  action="{{url('test')}}">
+        {!! csrf_field() !!}
+        <div class="form-group">
+            <label for="area">&Aacute;rea: </label>
+            <select name="area" id="area" class="form-control">
+                <option value="APrA">APrA</option>
+                <option value="EP">Espacio Público</option>
+                <option value="Trabajo">Trabajo</option>
+                <option value="GOCHU">GOCHU</option>
 
-        <option value="APrA">APrA</option>
-        <option value="EP">Espacio Público</option>
-        <option value="Trabajo">Trabajo</option>
-        <option value="GOCHU">GOCHU</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Archivo: </label>
+            <input type="file" name="archivo" accept=".xls, .xlsx, .csv" multiple>
 
-    </select>
+        </div>
+        <div class="form-group">
 
-    <label>Archivo: </label>
-    <input type="file" name="archivo" accept=".xls, .xlsx, .csv">
-
-    <br>
-    <br>
-    <input type="submit" value="Aceptar"/>
-</form>
+            <br>
+            <br>
+            <input type="submit" value="Aceptar"/>
+        </div>
+    </form>
+@endsection

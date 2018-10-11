@@ -74,64 +74,64 @@ class TestController
     public function ingresarInspeccion($archivo)
     {
         
-        Excel::load($archivo, function (LaravelExcelReader $reader)  {
-    
-            $reader->chunk(10, function (RowCollection $rowCollection){
-             
-                $rowCollection->each(function ( $row){
-                $inspeccion               = new Inspeccion();
-                $inspeccion->id           = $row->id;
-                $inspeccion->dependencia  = $row->dependencia;
-                $inspeccion->area         = $row->area;
-                $inspeccion->fecha        = $row->fecha_inspeccion;
-                $inspeccion->motivo       = $row->motivo;
-                $inspeccion->nombre_calle  = $row->nombrecalle;
-                $inspeccion->numero_puerta = $row->numeropuerta;
-                            
-                $SMPvalida = $this->busquedaSMPCalle($inspeccion->nombre_calle, $inspeccion->numero_puerta);
+        Excel::load($archivo, function (LaravelExcelReader $reader) {
+            
+            $reader->chunk(10, function (RowCollection $rowCollection) {
+                
+                $rowCollection->each(function ($row) {
+                    $inspeccion                = new Inspeccion();
+                    $inspeccion->id            = $row->id;
+                    $inspeccion->dependencia   = $row->dependencia;
+                    $inspeccion->area          = $row->area;
+                    $inspeccion->fecha         = $row->fecha_inspeccion;
+                    $inspeccion->motivo        = $row->motivo;
+                    $inspeccion->nombre_calle  = $row->nombrecalle;
+                    $inspeccion->numero_puerta = $row->numeropuerta;
                     
-                if ($SMPvalida != NULL ) {
-                    $inspeccion->seccion      = $SMPvalida->seccion ;
-                    $inspeccion->manzana      = $SMPvalida->manzana ;
-                    $inspeccion->parcela      = $SMPvalida->parcela ;
+                    $SMPvalida = $this->busquedaSMPCalle($inspeccion->nombre_calle, $inspeccion->numero_puerta);
                     
-                }
-                $inspeccion->domicilio            = $row->domicilio;
-                $inspeccion->piso_departamento    = $row->pisodepartamento;
-                $inspeccion->otros                = $row->otros;
-                $inspeccion->partida_matriz       = $row->nropartidamatriz;
-                $inspeccion->partida_horizontal   = $row->nropartidahorizontal;
-                $inspeccion->CUIT                 = $row->cuit;
-                $inspeccion->razon_social          = $row->razonsocial;  
-                $inspeccion->save();
-                   
+                    if ($SMPvalida != null) {
+                        $inspeccion->seccion = $SMPvalida->seccion;
+                        $inspeccion->manzana = $SMPvalida->manzana;
+                        $inspeccion->parcela = $SMPvalida->parcela;
+                        
+                    }
+                    $inspeccion->domicilio          = $row->domicilio;
+                    $inspeccion->piso_departamento  = $row->pisodepartamento;
+                    $inspeccion->otros              = $row->otros;
+                    $inspeccion->partida_matriz     = $row->nropartidamatriz;
+                    $inspeccion->partida_horizontal = $row->nropartidahorizontal;
+                    $inspeccion->CUIT               = $row->cuit;
+                    $inspeccion->razon_social       = $row->razonsocial;
+                    $inspeccion->save();
+                    
                 });
             });
         });
         
         return "Terminado";
     }
-              
+    
     public function busquedaSMPCalle($calle, $altura)
     {
         $smp = SMP::where('calle_1', '=', $calle)
             ->where('num', '=', $altura)
-            ->first();      
+            ->first();
         
         return $smp;
     }
-
-     public function exportExcel()
-    { 
+    
+    public function exportExcel()
+    {
         // dd(Inspeccion::first());
         /**
-         * toma en cuenta que para ver los mismos 
+         * toma en cuenta que para ver los mismos
          * datos debemos hacer la misma consulta
-        **/
-        Excel::create('Export', function($excel) {
-            $excel->sheet('Excel sheet', function($sheet) {
+         **/
+        Excel::create('Export', function ($excel) {
+            $excel->sheet('Excel sheet', function ($sheet) {
                 //otra opción -> $products = Product::select('name')->get();
-                $inspecciones = Inspeccion::all();                
+                $inspecciones = Inspeccion::all();
                 $sheet->fromArray($inspecciones);
                 $sheet->setOrientation('landscape');
             });
