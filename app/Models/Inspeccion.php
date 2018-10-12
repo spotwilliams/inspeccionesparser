@@ -21,4 +21,9 @@ class Inspeccion extends Model
     
     protected $guarded    = [];
     public    $timestamps = false;
+    
+    public $hidden
+        = [
+            'transaccionId',
+        ];
 }

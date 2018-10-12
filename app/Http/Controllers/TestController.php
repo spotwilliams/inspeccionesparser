@@ -31,7 +31,7 @@ class TestController
      */
     public function test()
     {
-        return view('test');
+        return view('home');
     }
     
     /**
