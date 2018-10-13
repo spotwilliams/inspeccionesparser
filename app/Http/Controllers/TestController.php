@@ -9,7 +9,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inspeccion;
+use App\Models\SMP2;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Collections\CellCollection;
@@ -148,9 +150,17 @@ class TestController
     
     public function busquedaSMPCalle($calle, $altura)
     {
-        $smp = SMP::where('calle_1', '=', $calle)
-            ->where('num', '=', $altura)
-            ->first();
+        try {
+            $smp = SMP::where('calle_1', '=', $calle)
+                ->where('num', '=', $altura)
+                ->firstOrFail();
+            
+        } catch (ModelNotFoundException $exception) {
+            
+            $smp = SMP2::where('calle_1', '=', $calle)
+                ->where('num', '=', $altura)
+                ->first();
+        }
         
         return $smp;
     }
