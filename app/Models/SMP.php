@@ -8,5 +8,7 @@ class SMP extends Model
 {
     protected $table = 'spm';
     
+    public $guarded = [];
+    public    $timestamps = false;
 }
 

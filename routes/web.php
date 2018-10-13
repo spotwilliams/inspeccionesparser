@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 Auth::routes();
-//Route::get('/', 'TestController@test')->name('home');
+Route::get('/', 'TestController@test')->name('home');
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'TestController@test')->name('index');
@@ -16,3 +16,15 @@ Route::group(['middleware' => 'auth'], function () {
     
 });
 
+
+Auth::routes();
+
+
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

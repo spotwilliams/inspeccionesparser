@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inspeccion;
+use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Collections\CellCollection;
@@ -101,15 +102,22 @@ class TestController
         
         Excel::load($archivo, function (LaravelExcelReader $reader) use ($transactionId) {
             
+            
+            $reader->setDateColumns(['fecha_inspeccion']);
+            $reader->formatDates(true, 'Y-m-d');
+            
             $reader->chunk(10, function (RowCollection $rowCollection) use ($transactionId) {
                 
                 $rowCollection->each(function ($row) use ($transactionId) {
+                    /** @var Carbon $fecha */
+                    $fecha = Carbon::create(1900, 1, 1)->addDays($row->fecha_inspeccion);
+                    $fecha->subDays(2);
                     $inspeccion                = new Inspeccion();
                     $inspeccion->transaccionId = $transactionId;
                     $inspeccion->id            = $row->id;
                     $inspeccion->dependencia   = $row->dependencia;
                     $inspeccion->area          = $row->area;
-                    $inspeccion->fecha         = $row->fecha_inspeccion;
+                    $inspeccion->fecha         = $fecha->format('d/m/Y');
                     $inspeccion->motivo        = $row->motivo;
                     $inspeccion->nombre_calle  = $row->nombrecalle;
                     $inspeccion->numero_puerta = $row->numeropuerta;
